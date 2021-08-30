@@ -1,33 +1,4 @@
-# Project Title
-
-<!-- INIT: This section should be removed after revission-->
-
----
-In this repository you'll find a template to be used in you projects. This
-template provided a complete set of files needed by the repositories, you can
-find a full list just down below.
-
-This is the template README file that must be modified to fit into your project.
-Use this README as the stepping stone for your project's documentation and a
-task list to review all the files needed to include in the project. All files
-define a basic document structure and some introductory text to prevent you from
-facing a blank page. This README file isn't an exception.
-
-Please, review, modify or delete the following project's assets. They must fit
-into your project's features:
-
-* [ ] Review [README file](README.md)
-* [ ] Review [code of conduct](CODE_OF_CONDUCT.md)
-* [ ] Review [contributing file](CONTRIBUTING.md)
-* [ ] Review issue [template for bugs](.github/ISSUE_TEMPLATE/bug_report.md)
-* [ ] Review issue [template for feature request](.github/ISSUE_TEMPLATE/feature_request.md)
-* [ ] Review [pull request template](.github/PULL_REQUEST_TEMPLATE/pull_request_template.md)
-* [ ] Review the [changelog file](CHANGELOG.md)
-* [ ] Review [license file](LICENSE)
-
-After finishing the assets review, you should delete this full section.
-
----
+# Workflow Dispatch Action
 
 <!-- END: This section should be removed after revission-->
 
@@ -42,20 +13,6 @@ __Description__: Put a meaningful, short, plain-language description of what
 this project is trying to accomplish and why it matters.
 Describe the problem(s) this project solves.
 Describe how this software can improve the lives of its audience.
-
-Other things to include:
-
-* __Technology stack__: Indicate the technological nature of the software,
-  including primary programming language(s) and whether the software is intended
-  as standalone or as a module in a framework or other ecosystem.
-* __Status__: Alpha, Beta, 1.1, etc. It's OK to write a sentence, too. The goal
-  is to let interested people know where this project is at. This is also a good
-  place to link to the [CHANGELOG](CHANGELOG.md).
-* __Links to production or demo instances__
-* __Related projects__: Describe what sets this apart from related-projects.
-  Linking to another doc or page is OK if this can't be expressed in a sentence
-  or two.
-* __Screenshots__: Include screenshots if you consider them neccesary.
 
 ## Table of content
 
@@ -75,37 +32,65 @@ Other things to include:
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## Dependencies
+## Inputs
 
-Describe any dependencies that must be installed for this software to work.
-This includes programming languages, databases or other storage mechanisms,
-build tools, frameworks, and so forth.
-If specific versions of other software are required, or known not to work, call
-that out.
-
-## Installation
-
-Detailed instructions on how to install, configure, and get the project running.
-This should be frequently tested to ensure reliability.
-
-## Configuration
-
-If the software is configurable, describe it in detail, either here or in other
-documentation to which you link.
-
+| Input          | Required  | Default             | Description                                                                                                    |
+|----------------|-----------|---------------------|----------------------------------------------------------------------------------------------------------------|
+| `token`        | **False** |                     | Personal access token used to fetch the repository. This field is required if app credentials are not defined. |
+| `organization` | **False** |                     | If application credentials are defined, this is the organization project that has the application installed.   |
+| `appId`        | **False** |                     | GitHub application ID.                                                                                         |
+| `privateKey`   | **False** |                     | GitHub application private key.                                                                                |
+| `clientId`     | **False** |                     | GitHub application client id.                                                                                  |
+| `clientSecret` | **False** |                     | GitHub application secret.                                                                                     |
+| `repository`   | **False** | `github.repository` | Repository where is stored the workflow.                                                                       |
+| `ref`          | **False** | `github.ref`        | Branch, tag or commit.                                                                                         |
+| `workflow`     | **True**  |                     | Workflow file name                                                                                             |
+| `inputs`       | **False** | `{}`                | JSON String with workflow imputs.                                                                              |
+  
 ## Usage
+  
+Use this action dispatching a workflow in the same repository using application credentials.
+  
+```yaml
+  test-local-dispatch:
+    name: Test local dispatch
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test workflow dispatch
+        uses: santander-group/workflow-dispatch-action@main
+        with:
+          appId: ${{ secrets.APP_ID }}
+          privateKey: ${{ secrets.APP_RSA_PRIVATE_KEY }}
+          clientId: ${{ secrets.APP_CLIENT_ID }}
+          clientSecret: ${{ secrets.APP_CLIENT_SECRET }}
+          workflow: nested-workflow.yml
+          inputs: "{\"name\":\"Command Line User\", \"home\":\"CLI\" }"
+```
 
-* Show users how to use the software.
-* Be specific.
-* Use appropriate formatting when showing code snippets.
+Use this action dispatching a workflow in an external repository using token.
+  
+```yaml
+  test-remote-dispatch:
+    name: Test remote workflow dispatch
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test remote workflow dispatch
+        uses: santander-group/workflow-dispatch-action@main
+        with:
+          token: ${{ secrets.USER_PAT }}
+          repository: the-iron-bank-of-braavos/poc-actions
+          ref: refs/heads/feature/workflow-dispatch
+          workflow: nested-workflow.yml
+          inputs: "{\"name\":\"Remote Command Line User\", \"home\":\"CLI\" }"
+```
 
-## How to test the software
-
-If the software includes automated tests, detail how to run those tests.
+You can use token or application credentials in both examples.
 
 ## Known issues
 
-Document any known significant shortcomings with the software.
+Not known.
 
 ## Getting help
 
@@ -114,9 +99,7 @@ an issue tracker, wiki, mailing list, etc.
 
 ## Getting involved
 
-This section should detail why people should get involved and describe key areas
-you are currently focusing on; e.g., trying to get feedback on features, fixing
-certain bugs, building important pieces, etc.
+Please, dont be afraid and get involved!
 
 General instructions on _how_ to contribute should be stated with a link to
 [CONTRIBUTING](CONTRIBUTING.md).
